@@ -3,22 +3,12 @@ from getch import getchar
 
 class Brainfuck:
 	def __init__(self, filePath):
-		with open(filePath, "r") as file:
-			self.file = file.read().replace('\n', '').replace('\r', '')
+		self.file = open(filePath, "rb")
 		self.tape = [0]
-		self.filePointer = 0
 		self.pointer = 0
 		
 	def readChar(self):
-		if self.filePointer == len(self.file):
-			return None
-		self.filePointer += 1
-		return self.file[self.filePointer - 1]
-	
-	def unreadChars(self, numChars):
-		if self.filePointer - numChars < 0:
-			raise RangeError("Negative index for file read")
-		self.filePointer -= numChars
+		return self.file.read(1).decode("utf-8")
 	
 	def isOperator(self, ch):
 		return ch in "><+-.,[]"
@@ -69,14 +59,14 @@ class Brainfuck:
 		elif ch == ']':
 			if self.tape[self.pointer] != 0:
 				balance = -1
-				self.unreadChars(2)
+				self.file.seek(self.file.tell() - 2)
 				ch2 = self.readChar()
 				if ch2 == '[':
 					balance += 1
 				elif ch2 == ']':
 					balance -= 1
 				while ch2 != '[' or balance != 0:
-					self.unreadChars(2)
+					self.file.seek(-2, 1)
 					ch2 = self.readChar()
 					if ch2 == '[':
 						balance += 1

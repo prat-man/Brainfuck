@@ -1,11 +1,12 @@
 import sys
+import numpy as np
 from getch import getchar
 
 class Brainfuck:
 	def __init__(self, filePath):
 		with open(filePath, "r") as file:
 			self.file = file.read().replace('\n', '').replace('\r', '')
-		self.tape = [0]
+		self.tape = np.zeros(30000).astype(int)
 		self.filePointer = 0
 		self.pointer = 0
 		
@@ -26,12 +27,12 @@ class Brainfuck:
 	def doOperation(self, ch):
 		if ch == '>':
 			self.pointer += 1
-			if self.pointer == len(self.tape):
-				self.tape.append(0)
+			if self.pointer == self.tape.size:
+				self.pointer = 0
 		
 		elif ch == '<':
 			if self.pointer == 0:
-				self.tape.insert(0, 0)
+				self.pointer = self.tape.size - 1
 			else:
 				self.pointer -= 1
 		
