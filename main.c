@@ -224,17 +224,6 @@ char readChar() {
 }
 
 /**
- * Unread specified number of character from the source file.
- */
-/*void unreadChars(int charNums) {
-    if (filePointer - charNums < 0) {
-        fprintf(stderr, "File pointer underflow\n");
-        exit(1);
-    }
-    filePointer -= charNums;
-}*/
-
-/**
  * Find first zero in tape at or to the left of position.
  */
 int findZeroLeft(int position) {
@@ -418,9 +407,9 @@ int equalsIgnoreCase(char* str1, char* str2) {
 }
 
 /**
- * Print usage message.
+ * Print help message.
  */
-void printUsage() {
+void printHelp() {
     printf("Description:\n");
     printf("    A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
     printf("    https://github.com/prat-man/Brainfuck\n\n");
@@ -457,7 +446,7 @@ int main(int argc, char** argv) {
         // check if help message is to be displayed
         if (equalsIgnoreCase(argv[i], "-h") || equalsIgnoreCase(argv[i], "-help")) {
             printf("\n");
-            printUsage();
+            printHelp();
             exit(0);
         }
 
@@ -486,7 +475,7 @@ int main(int argc, char** argv) {
             }
             else {
                 fprintf(stderr, "Invalid tape size [must be at least 10000]\n\n");
-                printUsage();
+                printHelp();
                 exit(1);
             }
         }
@@ -502,7 +491,7 @@ int main(int argc, char** argv) {
             }
             else {
                 fprintf(stderr, "Invalid stack size [must be at least 1000]\n\n");
-                printUsage();
+                printHelp();
                 exit(1);
             }
         }
@@ -515,7 +504,7 @@ int main(int argc, char** argv) {
         // unknown parameter, display error
         else {
             fprintf(stderr, "Invalid paramter: %s\n\n", argv[i]);
-            printUsage();
+            printHelp();
             exit(1);
         }
     }
@@ -524,12 +513,12 @@ int main(int argc, char** argv) {
     if (path == NULL) {
         if (argc > 1) {
             fprintf(stderr, "Path to source file not provided\n\n");
-            printUsage();
+            printHelp();
             exit(1);
         }
         else {
             printf("\n");
-            printUsage();
+            printHelp();
             exit(0);
         }
     }
