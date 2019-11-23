@@ -12,12 +12,22 @@
 #define SCAN_ZERO_LEFT  (INT_MAX - 2)
 #define SCAN_ZERO_RIGHT (INT_MAX - 3)
 
+// source file stored in memory for fast access
 char* source = NULL;
-int* jumps = NULL;
-int filePointer = 0;
+
+// size of source file in chars
 int fileSize;
 
+// pointer to next character to be read from file
+int filePointer = 0;
+
+// jumps and flags are preinitialized for optimized execution
+int* jumps = NULL;
+
+// the brainfuck tape - 0-255 - circular
 unsigned char* tape;
+
+// pointer to current location in tape
 int pointer = 0;
 
 /**
