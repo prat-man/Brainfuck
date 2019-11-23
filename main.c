@@ -84,9 +84,9 @@ void loadFile(char* filePath) {
  * Jumps between [ and ].
  * Compacts and jumps consecutive > and <.
  * Compacts and jumps consecutive + and -.
- * Optimizes for [-] to set(0).
- * Optimize [<] to scan_left(0).
- * Optimize [>] to scan_right(0).
+ * Optimizes [-] to set(0).
+ * Optimizes [<] to scan_left(0).
+ * Optimizes [>] to scan_right(0).
  */
 void initJumps() {
     // initialize jumps
