@@ -85,6 +85,8 @@ void loadFile(char* filePath) {
  * Compacts and jumps consecutive > and <.
  * Compacts and jumps consecutive + and -.
  * Optimizes for [-] to set(0).
+ * Optimize [<] to scan_left(0).
+ * Optimize [>] to scan_right(0).
  */
 void initJumps() {
     // initialize jumps
@@ -108,12 +110,12 @@ void initJumps() {
                 i += 2;
             }
             else if (ch2 == '<' && ch3 == ']') {
-                // optimize [<] to scanl(0)
+                // optimize [<] to scan_left(0)
                 jumps[i] = SCAN_ZERO_LEFT;
                 i += 2;
             }
             else if (ch2 == '>' && ch3 == ']') {
-                // optimize [>] to scanr(0)
+                // optimize [>] to scan_right(0)
                 jumps[i] = SCAN_ZERO_RIGHT;
                 i += 2;
             }
@@ -332,18 +334,22 @@ inline void doOperation(char ch) {
     // handle loop opening ([)
     else if (ch == '[') {
         int flag = jumps[filePointer - 1];
+        // optimize [-]
         if (flag == SET_ZERO) {
             tape[pointer] = 0;
             filePointer += 2;
         }
+        // optimize [<]
         else if (flag == SCAN_ZERO_LEFT) {
             pointer = findZeroLeft(pointer);
             filePointer += 2;
         }
+        // optimize [>]
         else if (flag == SCAN_ZERO_RIGHT) {
             pointer = findZeroRight(pointer);
             filePointer += 2;
         }
+        // optimize jump
         else if (tape[pointer] == 0) {
             filePointer = jumps[filePointer - 1] + 1;
         }
