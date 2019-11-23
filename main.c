@@ -13,10 +13,10 @@
 #define SCAN_ZERO_RIGHT (INT_MAX - 3)
 
 // size of tape to be used by the interpreter
-int TAPE_SIZE = 30000;
+static int TAPE_SIZE = 30000;
 
 // size of stack to be used by the interpreter
-int STACK_SIZE = 1000;
+static int STACK_SIZE = 1000;
 
 // source file stored in memory for fast access
 char* source = NULL;
@@ -261,7 +261,7 @@ int findZeroRight(int position) {
  * Perform the operation represented by the character.
  * Ignore character if it is not an operator.
  */
-inline void doOperation(char ch) {
+static inline void doOperation(char ch) {
     // handle pointer movement (> and <)
     if (ch == '>' || ch == '<') {
         int index = jumps[filePointer - 1];
