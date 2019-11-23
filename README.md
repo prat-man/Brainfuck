@@ -16,6 +16,17 @@ The language's name is a reference to the slang term brainfuck, which refers to 
 
 <br>
 
+## Optimizations
+
+ * Jumps between [ and ]
+ * Compacts and jumps consecutive > and <
+ * Compacts and jumps consecutive + and -
+ * Optimizes [-] to set(0)
+ * Optimizes [<] to scan_left(0)
+ * Optimizes [>] to scan_right(0)
+
+<br>
+
 ## Credits
 
 The executable icon is made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
