@@ -1,0 +1,2 @@
+http://code.activestate.com/recipes/134892-getch-like-unbuffered-character-reading-from-stdin/
+http://www.pythonapocrypha.com/Chapter22/Chapter22.shtml

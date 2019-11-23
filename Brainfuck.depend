@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1574495999 source:d:\codeblocks projects\brainfuck\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<limits.h>
+	"stack.h"
+	"memrchr.h"
+
+1574440454 source:d:\codeblocks projects\brainfuck\stack.c
+	<stdio.h>
+	<stdlib.h>
+	"stack.h"
+
+1574438672 d:\codeblocks projects\brainfuck\stack.h
+
+1574457718 source:d:\codeblocks projects\brainfuck\qdb.c
+	<stdio.h>
+
+1574465170 source:d:\codeblocks projects\brainfuck\memrchr.c
+	<string.h>
+	"memrchr.h"
+
+1574465174 d:\codeblocks projects\brainfuck\memrchr.h
+
