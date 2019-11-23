@@ -7,10 +7,14 @@
 	"stack.h"
 	"memrchr.h"
 
+1574465170 "
+
 1574440454 source:d:\codeblocks projects\brainfuck\stack.c
 	<stdio.h>
 	<stdlib.h>
 	"stack.h"
+
+1574457718 
 
 1574438672 d:\codeblocks projects\brainfuck\stack.h
 
@@ -22,4 +26,21 @@
 	"memrchr.h"
 
 1574465174 d:\codeblocks projects\brainfuck\memrchr.h
+
+1574503997 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<limits.h>
+	"stack.h"
+
+1574499150 /mnt/D Drive/Codeblocks Projects/Brainfuck/stack.h
+
+1574502160 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/resource.rc
+	<windows.h>
+
+1574499150 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/stack.c
+	<stdio.h>
+	<stdlib.h>
+	"stack.h"
 
