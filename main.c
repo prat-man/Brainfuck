@@ -3,7 +3,6 @@
 #include <string.h>
 #include <limits.h>
 #include "stack.h"
-#include "memrchr.h"
 
 #define TAPE_SIZE 30000
 #define STACK_SIZE 1000
