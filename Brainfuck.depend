@@ -58,3 +58,18 @@
 1574502160 source:d:\codeblocks projects\brainfuck\resource.rc
 	<windows.h>
 
+1574499150 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/stack.c
+	<stdio.h>
+	<stdlib.h>
+	"stack.h"
+
+1574499150 /mnt/D Drive/Codeblocks Projects/Brainfuck/stack.h
+
+1574541149 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<limits.h>
+	<ctype.h>
+	"stack.h"
+
