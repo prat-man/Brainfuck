@@ -430,7 +430,7 @@ void printHelp() {
     printf("    -i\n");
     printf("    -info       Show product information and exit\n\n");
     printf("    -h\n");
-    printf("    -help       Show this help message and exit\n");
+    printf("    -help       Show this help message and exit\n\n");
 }
 
 /**

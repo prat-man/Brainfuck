@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1574537105 source:d:\codeblocks projects\brainfuck\main.c
+1574538176 source:d:\codeblocks projects\brainfuck\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -7,14 +7,14 @@
 	<ctype.h>
 	"stack.h"
 
+1574499150 
+
 1574465170 "
 
 1574499150 source:d:\codeblocks projects\brainfuck\stack.c
 	<stdio.h>
 	<stdlib.h>
 	"stack.h"
-
-1574457718 
 
 1574499150 d:\codeblocks projects\brainfuck\stack.h
 
@@ -27,11 +27,17 @@
 
 1574465174 d:\codeblocks projects\brainfuck\memrchr.h
 
-1574503997 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/main.c
+1574537105 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<limits.h>
+	"stack.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<limits.h>
+	<ctype.h>
 	"stack.h"
 
 1574499150 /mnt/D Drive/Codeblocks Projects/Brainfuck/stack.h
@@ -39,7 +45,12 @@
 1574502160 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/resource.rc
 	<windows.h>
 
+1574502160 >
+
 1574499150 source:/mnt/D Drive/Codeblocks Projects/Brainfuck/stack.c
+	<stdio.h>
+	<stdlib.h>
+	"stack.h"
 	<stdio.h>
 	<stdlib.h>
 	"stack.h"
