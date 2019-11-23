@@ -1,3 +1,5 @@
+<img src="https://github.com/prat-man/Brainfuck/blob/master/icon.ico" alt="Brainfuck Interpreter Logo" width="150">
+
 # Brainfuck
 
 Brainfuck is an esoteric programming language created in 1993 by Urban Müller, and is notable for its extreme minimalism.
