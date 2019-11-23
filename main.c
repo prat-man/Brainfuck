@@ -385,12 +385,11 @@ void execute(char* filePath) {
  * Main entry point to the interpreter.
  */
 int main(int argc, char** argv) {
-    /*if (argc < 2) {
+    if (argc < 2) {
         printf("Usage: brainfuck [source file path]\n");
     }
     else {
         execute(argv[1]);
-    }*/
-    execute("mandelbrot.bf");
+    }
     return 0;
 }
