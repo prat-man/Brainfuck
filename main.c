@@ -2,15 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <ctype.h>
 #include "stack.h"
 
-#define TAPE_SIZE 30000
-#define STACK_SIZE 1000
+#define VERSION "1.0"
 
 #define NO_JUMP         INT_MAX
 #define SET_ZERO        (INT_MAX - 1)
 #define SCAN_ZERO_LEFT  (INT_MAX - 2)
 #define SCAN_ZERO_RIGHT (INT_MAX - 3)
+
+// size of tape to be used by the interpreter
+int TAPE_SIZE = 30000;
+
+// size of stack to be used by the interpreter
+int STACK_SIZE = 1000;
 
 // source file stored in memory for fast access
 char* source = NULL;
@@ -43,7 +49,7 @@ void loadFile(char* filePath) {
             long bufsize = ftell(fp);
             if (bufsize == -1) {
                 // display error message and exir
-                fprintf(stderr, "Error reading source file!\n");
+                fprintf(stderr, "Error reading source file: %s\n", filePath);
                 exit(1);
             }
 
@@ -53,7 +59,7 @@ void loadFile(char* filePath) {
             // go back to the start of the file
             if (fseek(fp, 0L, SEEK_SET) != 0) {
                 // display error message and exit
-                fprintf(stderr, "Error reading source file!\n");
+                fprintf(stderr, "Error reading source file: %s\n", filePath);
                 exit(1);
             }
 
@@ -61,7 +67,7 @@ void loadFile(char* filePath) {
             size_t newLen = fileSize = fread(source, sizeof(char), bufsize, fp);
             if (ferror(fp) != 0) {
                 // display error message and exit
-                fprintf(stderr, "Error reading source file!\n");
+                fprintf(stderr, "Error reading source file: %s\n", filePath);
                 exit(1);
             } else {
                 // append a null character just to be safe
@@ -74,7 +80,7 @@ void loadFile(char* filePath) {
     }
     else {
         // display error message and exit
-        fprintf(stderr, "Source file not found!\n");
+        fprintf(stderr, "Source file not found: %s\n", filePath);
         exit(1);
     }
 }
@@ -222,7 +228,7 @@ char readChar() {
  */
 /*void unreadChars(int charNums) {
     if (filePointer - charNums < 0) {
-        fprintf(stderr, "File pointer underflow!\n");
+        fprintf(stderr, "File pointer underflow\n");
         exit(1);
     }
     filePointer -= charNums;
@@ -397,14 +403,140 @@ void execute(char* filePath) {
 }
 
 /**
+ * Compare two strings for equality, ignoring their cases.
+ */
+int equalsIgnoreCase(char* str1, char* str2) {
+    for (int i = 0; ; i++) {
+        if (str1[i] == '\0' && str2[i] == '\0') {
+            break;
+        }
+        else if (tolower(str1[i]) != tolower(str2[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/**
+ * Print usage message.
+ */
+void printUsage() {
+    printf("Description:\n");
+    printf("    A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
+    printf("    https://github.com/prat-man/Brainfuck\n\n");
+
+    printf("Version:\n");
+    printf("    %s\n\n", VERSION);
+
+    printf("Usage:\n");
+    printf("    brainfuck [options] <source file path>\n\n");
+
+    printf("Options:\n");
+    printf("    -t\n");
+    printf("    -tape       Size of interpreter tape [must be equal to or above 10000]\n\n");
+    printf("    -s\n");
+    printf("    -stack      Size of interpreter stack [must be equal to or above 1000]\n\n");
+    printf("    -v\n");
+    printf("    -version    Show product version and exit\n\n");
+    printf("    -i\n");
+    printf("    -info       Show product information and exit\n\n");
+    printf("    -h\n");
+    printf("    -help       Show this help message and exit\n");
+}
+
+/**
  * Main entry point to the interpreter.
  */
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        printf("Usage: brainfuck [source file path]\n");
+
+    // variable to extract and store source file path from command line arguments
+    char* path = NULL;
+
+    // extract parameters and source file path from command line arguments
+    for (int i = 1; i < argc; i++) {
+        // check if help message is to be displayed
+        if (equalsIgnoreCase(argv[i], "-h") || equalsIgnoreCase(argv[i], "-help")) {
+            printf("\n");
+            printUsage();
+            exit(0);
+        }
+
+        // check if version is to be displayed
+        else if (equalsIgnoreCase(argv[i], "-v") || equalsIgnoreCase(argv[i], "-version")) {
+            printf("%s\n", VERSION);
+            exit(0);
+        }
+
+        // check if informtion is to be displayed
+        else if (equalsIgnoreCase(argv[i], "-i") || equalsIgnoreCase(argv[i], "-info")) {
+            printf("brainfuck %s\n", VERSION);
+            printf("A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
+            printf("https://github.com/prat-man/Brainfuck\n");
+            exit(0);
+        }
+
+        // check if tape size is to be customized
+        else if (equalsIgnoreCase(argv[i], "-t") || equalsIgnoreCase(argv[i], "-tape")) {
+            int tapeSz = 0;
+            if (i + 1 < argc) {
+                tapeSz = atoi(argv[++i]);
+            }
+            if (tapeSz >= 10000) {
+                TAPE_SIZE = tapeSz;
+            }
+            else {
+                fprintf(stderr, "Invalid tape size [must be at least 10000]\n\n");
+                printUsage();
+                exit(1);
+            }
+        }
+
+        // check if stack size is to be changed
+        else if (equalsIgnoreCase(argv[i], "-s") || equalsIgnoreCase(argv[i], "-stack")) {
+            int stackSz = 0;
+            if (i + 1 < argc) {
+                stackSz = atoi(argv[++i]);
+            }
+            if (stackSz >= 1000) {
+                STACK_SIZE = stackSz;
+            }
+            else {
+                fprintf(stderr, "Invalid stack size [must be at least 1000]\n\n");
+                printUsage();
+                exit(1);
+            }
+        }
+
+        // get the path to source file (only once)
+        else if (path == NULL) {
+            path = argv[i];
+        }
+
+        // unknown parameter, display error
+        else {
+            fprintf(stderr, "Invalid paramter: %s\n\n", argv[i]);
+            printUsage();
+            exit(1);
+        }
     }
-    else {
-        execute(argv[1]);
+
+    // check if path to source file is present
+    if (path == NULL) {
+        if (argc > 1) {
+            fprintf(stderr, "Path to source file not provided\n\n");
+            printUsage();
+            exit(1);
+        }
+        else {
+            printf("\n");
+            printUsage();
+            exit(0);
+        }
     }
+
+    // execute the brainfuck code
+    execute(path);
+
+    // execution is successful, return success code
     return 0;
 }
