@@ -12,7 +12,24 @@ The language's name is a reference to the slang term brainfuck, which refers to 
 
 ## Usage
 
-    brainfuck [source file path]
+    brainfuck [options] <source file path>
+    
+#### Options
+
+    -t
+    -tape       Size of interpreter tape [must be equal to or above 10000]
+
+    -s
+    -stack      Size of interpreter stack [must be equal to or above 1000]
+
+    -v
+    -version    Show product version and exit
+
+    -i
+    -info       Show product information and exit
+
+    -h
+    -help       Show this help message and exit
 
 <br>
 
