@@ -31,17 +31,17 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="icon.ico" />
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="resource.rc">
+		<Unit filename="res/icon.ico" />
+		<Unit filename="res/resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="stack.c">
+		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="stack.h" />
+		<Unit filename="src/stack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/stack.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
