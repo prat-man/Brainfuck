@@ -45,9 +45,9 @@ It is implemented with multiple optimizations to increase execution speed. It is
 
 Run the following commands inside <code>src</code> directory.
 
-    gcc main.c -o main.o -c
-    gcc stack.c -o stack.o -c
-    gcc -o brainfuck main.o stack.o
+    gcc main.c -o main.o -c -O3
+    gcc stack.c -o stack.o -c -O3
+    gcc -o brainfuck main.o stack.o -O3
 
 <br>
 
