@@ -1,4 +1,4 @@
-<img src="https://github.com/prat-man/Brainfuck/blob/master/icon.ico" alt="Brainfuck Interpreter Logo" width="150">
+<img src="https://github.com/prat-man/Brainfuck/blob/master/res/icon.ico" alt="Brainfuck Interpreter Logo" width="150">
 
 # Brainfuck
 
