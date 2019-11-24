@@ -385,11 +385,68 @@ void execute(char* filePath) {
     // initialize file jumps for optimization
     initJumps();
 
+    /*cFile = fopen("E:\\a.c", "w");
+
+    fprintf(cFile, "#include<stdio.h>\n");
+    fprintf(cFile, "#include<string.h>\n\n");
+    fprintf(cFile, "#define TAPE_SIZE %d\n\n", TAPE_SIZE);
+    fprintf(cFile, "unsigned char tape[TAPE_SIZE];\n");
+    fprintf(cFile, "int pointer = 0;\n\n");
+    fprintf(cFile, "int findZeroLeft(int position) { for (int i = position; i >= 0; i--) { if (tape[i] == 0) { return i; } } for (int i = TAPE_SIZE - 1; i > position; i--) { if (tape[i] == 0) { return i; } } return -1; }\n");
+    fprintf(cFile, "int findZeroRight(int position) { for (int i = position; i < TAPE_SIZE; i++) { if (tape[i] == 0) { return i; } } for (int i = 0; i < position; i++) { if (tape[i] == 0) { return i; } } return -1; }\n\n");
+    fprintf(cFile, "int main() {\n");
+    fprintf(cFile, "memset(tape, 0, TAPE_SIZE);\n");*/
+
     // for each character do operation
     char ch;
     while ((ch = readChar()) != -1) {
         doOperation(ch);
+        //doTranslate(ch);
     }
+
+    /*fprintf(cFile, "return 0;\n}\
+    n");
+
+    fclose(cFile);*/
+}
+/**
+ * Compile the brainfuck source code.
+ */
+void compile(char* filePath) {
+    // clean before exit
+    atexit(clean);
+
+    // initialize tape and fill with zeros
+    tape = (unsigned char*) malloc(sizeof(unsigned char) * (TAPE_SIZE));
+    memset(tape, 0, TAPE_SIZE);
+
+    // load source file
+    loadFile(filePath);
+
+    // initialize file jumps for optimization
+    initJumps();
+
+    cFile = fopen("E:\\a.c", "w");
+
+    fprintf(cFile, "#include<stdio.h>\n");
+    fprintf(cFile, "#include<string.h>\n\n");
+    fprintf(cFile, "#define TAPE_SIZE %d\n\n", TAPE_SIZE);
+    fprintf(cFile, "unsigned char tape[TAPE_SIZE];\n");
+    fprintf(cFile, "int pointer = 0;\n\n");
+    fprintf(cFile, "int findZeroLeft(int position) { for (int i = position; i >= 0; i--) { if (tape[i] == 0) { return i; } } for (int i = TAPE_SIZE - 1; i > position; i--) { if (tape[i] == 0) { return i; } } return -1; }\n");
+    fprintf(cFile, "int findZeroRight(int position) { for (int i = position; i < TAPE_SIZE; i++) { if (tape[i] == 0) { return i; } } for (int i = 0; i < position; i++) { if (tape[i] == 0) { return i; } } return -1; }\n\n");
+    fprintf(cFile, "int main() {\n");
+    fprintf(cFile, "memset(tape, 0, TAPE_SIZE);\n");
+
+    // for each character do operation
+    char ch;
+    while ((ch = readChar()) != -1) {
+        doTranslate(ch);
+    }
+
+    fprintf(cFile, "return 0;\n}\n");
+
+    fclose(cFile);
 }
 
 /**
@@ -510,6 +567,8 @@ int main(int argc, char** argv) {
         }
     }
 
+    path = "test/mandelbrot.bf";
+
     // check if path to source file is present
     if (path == NULL) {
         if (argc > 1) {
@@ -525,7 +584,7 @@ int main(int argc, char** argv) {
     }
 
     // execute the brainfuck code
-    execute(path);
+    compile(path);
 
     // execution is successful, return success code
     return 0;
