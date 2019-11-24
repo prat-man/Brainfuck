@@ -4,8 +4,9 @@
 #include <limits.h>
 #include <ctype.h>
 #include "stack.h"
+#include "bftoc.c"
 
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 #define NO_JUMP         INT_MAX
 #define SET_ZERO        (INT_MAX - 1)
