@@ -41,6 +41,16 @@ It is implemented with multiple optimizations to increase execution speed. It is
 
 <br>
 
+## Build
+
+Run the following commands inside <code>src</code> directory.
+
+    gcc main.c -o main.o -c
+    gcc stack.c -o stack.o -c
+    gcc -o brainfuck main.o stack.o
+
+<br>
+
 ## Optimizations
 
  * Jumps between [ and ]
