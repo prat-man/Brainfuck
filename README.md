@@ -8,7 +8,13 @@ The language consists of only eight simple commands and an instruction pointer. 
 
 The language's name is a reference to the slang term brainfuck, which refers to things so complicated or unusual that they exceed the limits of one's understanding.
 
-This project presents a fast Brainfuck interpreter written in C. It is implemented with multiple optimizations to increase execution speed. It is cross-platform compatible, and has been tested on Windows and Linux.
+<br>
+
+## Brainfuck Interpreter
+
+This project presents a fast Brainfuck interpreter written in C.
+
+It is implemented with multiple optimizations to increase execution speed. It is cross-platform compatible, and has been tested on Windows and Linux.
 
 <br>
 
