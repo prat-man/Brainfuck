@@ -24,9 +24,9 @@ It is cross-platform compatible, and has been tested on Windows and Linux.
 This project provides a fast Brainfuck compiler written in C.
 
 It converts brainfuck code to highly optimized C code and then compiles the C code into machine executable file using GCC.
-To compile brainfuck code, use the <code>-c</code> option.
+To compile brainfuck code, use the <code>-c</code> or <code>--compile</code> option.
 
-If desired, brainfuck code can be translated to C code without compiling to executable using the <code>-x</code> option.
+If desired, brainfuck code can be translated to C code without compiling to executable using the <code>-x</code> or <code>--translate</code> option.
 
 The generated C code is cross-platform compatible, and has been tested on Windows and Linux.
 
