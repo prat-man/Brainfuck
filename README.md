@@ -15,7 +15,7 @@ The language's name is a reference to the slang term brainfuck, which refers to 
 This project provides a fast Brainfuck interpreter written in C.
 
 It is implemented with multiple optimizations to increase execution speed.<br>
-It is cross-platform compatible, and has been tested on Windows and Linux.
+It is cross-platform compatible, and has been tested on Windows, Linux, and macOS.
 
 <br>
 
@@ -28,7 +28,7 @@ To compile brainfuck code, use the <code>-c</code> or <code>--compile</code> opt
 
 If desired, brainfuck code can be translated to C code without compiling to executable using the <code>-x</code> or <code>--translate</code> option.
 
-The generated C code is cross-platform compatible, and has been tested on Windows and Linux.
+The generated C code is cross-platform compatible, and has been tested on Windows, Linux, and macOS.
 
 <br>
 
