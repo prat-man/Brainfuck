@@ -3,12 +3,12 @@
 
 #include "commons.h"
 
-FILE* cFile;
+FILE* cFile = NULL;
 
-char* cFilePath;
-char* exeFilePath;
+char* cFilePath = NULL;
+char* exeFilePath = NULL;
 
-char* indent;
+char* indent = NULL;
 int indentPointer;
 
 /**
@@ -33,10 +33,25 @@ static inline void initTranslator(char* filePath) {
  * Clean up the Brainfuck to C translator.
  */
 static inline void cleanupTranslator() {
-    fclose(cFile);
-    free(indent);
-    free(cFilePath);
-    free(exeFilePath);
+    // close cFile
+    if (cFile != NULL) {
+        fclose(cFile);
+    }
+
+    // free indent
+    if (indent != NULL) {
+        free(indent);
+    }
+
+    // free cFilePath
+    if (cFilePath != NULL) {
+        free(cFilePath);
+    }
+
+    // free exeFilePath
+    if (exeFilePath != NULL) {
+        free(exeFilePath);
+    }
 }
 
 /**

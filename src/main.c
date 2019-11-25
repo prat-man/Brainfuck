@@ -28,7 +28,7 @@ int filePointer = 0;
 int* jumps = NULL;
 
 // the brainfuck tape - 0-255 - circular
-unsigned char* tape;
+unsigned char* tape = NULL;
 
 // pointer to current location in tape
 int pointer = 0;
@@ -258,9 +258,22 @@ int findZeroRight(int position) {
  * Free all resources to prevent memory leaks.
  */
 void clean() {
-    free(source);
-    free(jumps);
-    free(tape);
+    // free source
+    if (source != NULL) {
+        free(source);
+    }
+
+    // free jumps
+    if (jumps != NULL) {
+        free(jumps);
+    }
+
+    // free tape
+    if (tape != NULL) {
+        free(tape);
+    }
+
+    // clean translator
     cleanupTranslator();
 }
 
