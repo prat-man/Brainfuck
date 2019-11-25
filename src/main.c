@@ -352,6 +352,9 @@ void translate(char* filePath) {
     cleanupTranslator();
 }
 
+/**
+ * Execute a system call silently.
+ */
 int executeCommand(const char *cmd) {
     // build command string
     char command[strlen(cmd) + strlen(" 2>&1 | \"%s\" --null") + 2 * strlen(programExecutablePath)];
