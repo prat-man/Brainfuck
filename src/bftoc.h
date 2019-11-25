@@ -36,21 +36,25 @@ static inline void cleanupTranslator() {
     // close cFile
     if (cFile != NULL) {
         fclose(cFile);
+        cFile = NULL;
     }
 
     // free indent
     if (indent != NULL) {
         free(indent);
+        indent = NULL;
     }
 
     // free cFilePath
     if (cFilePath != NULL) {
         free(cFilePath);
+        cFilePath = NULL;
     }
 
     // free exeFilePath
     if (exeFilePath != NULL) {
         free(exeFilePath);
+        exeFilePath = NULL;
     }
 }
 

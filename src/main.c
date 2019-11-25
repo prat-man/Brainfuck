@@ -265,16 +265,19 @@ void clean() {
     // free source
     if (source != NULL) {
         free(source);
+        source = NULL;
     }
 
     // free jumps
     if (jumps != NULL) {
         free(jumps);
+        jumps = NULL;
     }
 
     // free tape
     if (tape != NULL) {
         free(tape);
+        tape = NULL;
     }
 
     // free stack
