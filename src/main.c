@@ -212,6 +212,7 @@ void initJumps() {
 
     // free stack
     stackFree(stack);
+    stack = NULL;
 }
 
 /**
