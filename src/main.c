@@ -352,6 +352,18 @@ void translate(char* filePath) {
     cleanupTranslator();
 }
 
+int executeCommand(const char *cmd) {
+    // build command string
+    char command[strlen(cmd) + strlen(" 2>&1 | \"%s\" --null") + 2 * strlen(programExecutablePath)];
+    sprintf(command, "%s 2>&1 | \"%s\" --null", cmd, programExecutablePath);
+
+    // execute the command
+    int out = system(command);
+
+    // return success or error
+    return out == 0;
+}
+
 /**
  * Compile the generated C code.
  */
@@ -362,21 +374,35 @@ void compile(char* filePath) {
     // generate executable file path
     exeFilePath = generateExecutableFilePath(filePath);
 
+    // test if gcc is installed
+    if (!executeCommand("gcc --version")) {
+        fprintf(stderr, "The C compiler \"gcc\" was not found. GCC is required for compilation.\nIf GCC is installed please check if it is properly added to path.\n");
+        exit(1);
+    }
+
     // build command string
     char command[strlen("gcc \"%s\" -o \"%s\"") + strlen(cFilePath) + strlen(exeFilePath)];
     sprintf(command, "gcc \"%s\" -o \"%s\"", cFilePath, exeFilePath);
 
     // compile the program
-    int out = system(command);
+    int commandOut = executeCommand(command);
 
     // free file paths
     free(cFilePath);
     free(exeFilePath);
 
     // build failed
-    if (out != 0) {
+    if (!commandOut) {
         fprintf(stderr, "Failed to compile program.");
+        exit(1);
     }
+}
+
+/**
+ * Compare two strings for equality, case sensitive.
+ */
+int equals(const char* str1, const char* str2) {
+    return strcmp(str1, str2) == 0;
 }
 
 /**
@@ -414,7 +440,7 @@ int endsWithIgnoreCase(const char *str, const char *suffix) {
  */
 void printHelp() {
     printf("Description:\n");
-    printf("    A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
+    printf("    A fast Brainfuck interpreter and compiler written in C by Pratanu Mandal\n");
     printf("    https://github.com/prat-man/Brainfuck\n\n");
 
     printf("Version:\n");
@@ -425,25 +451,28 @@ void printHelp() {
 
     printf("Options:\n");
     printf("    -c\n");
-    printf("    -compile    Translate to C and compile to machine code [requires gcc]\n\n");
+    printf("    --compile     Translate to C and compile to machine code [requires GCC]\n\n");
     printf("    -x\n");
-    printf("    -translate  Translate to C but do not compile\n\n");
+    printf("    --translate   Translate to C but do not compile\n\n");
     printf("    -t\n");
-    printf("    -tape       Size of interpreter tape [must be equal to or above 10000]\n\n");
+    printf("    --tape        Size of interpreter tape [must be equal to or above %d]\n\n", MIN_TAPE_SIZE);
     printf("    -s\n");
-    printf("    -stack      Size of interpreter stack [must be equal to or above 1000]\n\n");
+    printf("    --stack       Size of interpreter stack [must be equal to or above %d]\n\n", MIN_STACK_SIZE);
     printf("    -v\n");
-    printf("    -version    Show product version and exit\n\n");
+    printf("    --version     Show product version and exit\n\n");
     printf("    -i\n");
-    printf("    -info       Show product information and exit\n\n");
+    printf("    --info        Show product information and exit\n\n");
     printf("    -h\n");
-    printf("    -help       Show this help message and exit\n\n");
+    printf("    --help        Show this help message and exit\n\n");
 }
 
 /**
- * Main entry point to the interpreter.
+ * Main entry point to the program.
  */
 int main(int argc, char** argv) {
+
+    // store program executable path for future reference
+    programExecutablePath = argv[0];
 
     // by default, execute
     int compileFlag = 0, translateFlag = 0;
@@ -453,64 +482,70 @@ int main(int argc, char** argv) {
 
     // extract parameters and source file path from command line arguments
     for (int i = 1; i < argc; i++) {
+        // consume all
+        // this is for silent command execution
+        if (equals(argv[i], "--null")) {
+            exit(0);
+        }
+
         // check if help message is to be displayed
-        if (equalsIgnoreCase(argv[i], "-h") || equalsIgnoreCase(argv[i], "-help")) {
+        else if (equals(argv[i], "-h") || equals(argv[i], "--help")) {
             printf("\n");
             printHelp();
             exit(0);
         }
 
         // check if version is to be displayed
-        else if (equalsIgnoreCase(argv[i], "-v") || equalsIgnoreCase(argv[i], "-version")) {
+        else if (equals(argv[i], "-v") || equals(argv[i], "--version")) {
             printf("%s\n", VERSION);
             exit(0);
         }
 
         // check if informtion is to be displayed
-        else if (equalsIgnoreCase(argv[i], "-i") || equalsIgnoreCase(argv[i], "-info")) {
+        else if (equals(argv[i], "-i") || equals(argv[i], "--info")) {
             printf("brainfuck %s\n", VERSION);
-            printf("A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
+            printf("A fast Brainfuck interpreter and compiler written in C by Pratanu Mandal\n");
             printf("https://github.com/prat-man/Brainfuck\n");
             exit(0);
         }
 
         // check if it is to be translated to C and compiled to machine code
-        else if (equalsIgnoreCase(argv[i], "-c") || equalsIgnoreCase(argv[i], "-compile")) {
+        else if (equals(argv[i], "-c") || equals(argv[i], "--compile")) {
             compileFlag = 1;
         }
 
         // check if it is to be translated to C
-        else if (equalsIgnoreCase(argv[i], "-x") || equalsIgnoreCase(argv[i], "-translate")) {
+        else if (equals(argv[i], "-x") || equals(argv[i], "--translate")) {
             translateFlag = 1;
         }
 
         // check if tape size is to be customized
-        else if (equalsIgnoreCase(argv[i], "-t") || equalsIgnoreCase(argv[i], "-tape")) {
+        else if (equals(argv[i], "-t") || equals(argv[i], "--tape")) {
             int tapeSz = 0;
             if (i + 1 < argc) {
                 tapeSz = atoi(argv[++i]);
             }
-            if (tapeSz >= 10000) {
+            if (tapeSz >= MIN_TAPE_SIZE) {
                 TAPE_SIZE = tapeSz;
             }
             else {
-                fprintf(stderr, "Invalid tape size [must be at least 10000]\n\n");
+                fprintf(stderr, "Invalid tape size [must be at least %d]\n\n", MIN_TAPE_SIZE);
                 printHelp();
                 exit(1);
             }
         }
 
         // check if stack size is to be changed
-        else if (equalsIgnoreCase(argv[i], "-s") || equalsIgnoreCase(argv[i], "-stack")) {
+        else if (equals(argv[i], "-s") || equals(argv[i], "--stack")) {
             int stackSz = 0;
             if (i + 1 < argc) {
                 stackSz = atoi(argv[++i]);
             }
-            if (stackSz >= 1000) {
+            if (stackSz >= MIN_STACK_SIZE) {
                 STACK_SIZE = stackSz;
             }
             else {
-                fprintf(stderr, "Invalid stack size [must be at least 1000]\n\n");
+                fprintf(stderr, "Invalid stack size [must be at least %d]\n\n", MIN_STACK_SIZE);
                 printHelp();
                 exit(1);
             }
@@ -518,12 +553,13 @@ int main(int argc, char** argv) {
 
         // get the path to source file (only once)
         else if (path == NULL) {
+
             path = argv[i];
         }
 
         // unknown parameter, display error
         else {
-            fprintf(stderr, "Invalid paramter: %s\n\n", argv[i]);
+            fprintf(stderr, "Unknown paramter: %s\n\n", argv[i]);
             printHelp();
             exit(1);
         }
@@ -545,7 +581,8 @@ int main(int argc, char** argv) {
 
     // check if filename is standards compliant
     if (!endsWithIgnoreCase(path, ".bf")) {
-        fprintf(stderr, "File format not recognized [must end with \".bf\"]\n\n");
+        fprintf(stderr, "Invalid file name: %s\n", path);
+        fprintf(stderr, "File format not recognized [must end with \".bf\"]\n");
         exit(1);
     }
 
