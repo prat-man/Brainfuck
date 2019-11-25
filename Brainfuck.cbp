@@ -35,6 +35,9 @@
 		<Unit filename="res/resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="src/bfi.h" />
+		<Unit filename="src/bftoc.h" />
+		<Unit filename="src/commons.h" />
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
 		</Unit>

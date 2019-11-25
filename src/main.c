@@ -3,15 +3,11 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>
+
 #include "stack.h"
-#include "bftoc.c"
-
-#define VERSION "1.1"
-
-#define NO_JUMP         INT_MAX
-#define SET_ZERO        (INT_MAX - 1)
-#define SCAN_ZERO_LEFT  (INT_MAX - 2)
-#define SCAN_ZERO_RIGHT (INT_MAX - 3)
+#include "commons.h"
+#include "bfi.h"
+#include "bftoc.h"
 
 // size of tape to be used by the interpreter
 static int TAPE_SIZE = 30000;
@@ -151,7 +147,7 @@ void initJumps() {
                 else if (source[i] == '<') {
                     sum--;
                 }
-                else {
+                else if (isOperator(source[i])) {
                     break;
                 }
             }
@@ -180,7 +176,7 @@ void initJumps() {
                 else if (source[i] == '-') {
                     sum--;
                 }
-                else {
+                else if (isOperator(source[i])) {
                     break;
                 }
             }
@@ -259,122 +255,50 @@ int findZeroRight(int position) {
 }
 
 /**
- * Perform the operation represented by the character.
- * Ignore character if it is not an operator.
- */
-static inline void doOperation(char ch) {
-    // handle pointer movement (> and <)
-    if (ch == '>' || ch == '<') {
-        int index = jumps[filePointer - 1];
-
-        if (index == NO_JUMP) {
-            if (ch == '>') {
-                pointer = (pointer + 1) % TAPE_SIZE;
-            }
-            else {
-                if (pointer == 0) {
-                    pointer = TAPE_SIZE - 1;
-                }
-                else {
-                    pointer--;
-                }
-            }
-        }
-        else {
-            int sum = jumps[index];
-
-            if (sum > 0) {
-                pointer = (pointer + sum) % TAPE_SIZE;
-            }
-            else if (sum < 0) {
-                pointer = (pointer + sum);
-                if (pointer < 0) {
-                    pointer = TAPE_SIZE + pointer;
-                }
-            }
-
-            filePointer = index + 1;
-        }
-    }
-
-    // handle value update (+ and -)
-    else if (ch == '+' || ch == '-') {
-        int index = jumps[filePointer - 1];
-
-        if (index == NO_JUMP) {
-            if (ch == '+') {
-                tape[pointer]++;
-            }
-            else {
-                tape[pointer]--;
-            }
-        }
-        else {
-            int sum = jumps[index];
-            tape[pointer] += sum;
-            filePointer = index + 1;
-        }
-    }
-
-    // handle output (.)
-    else if (ch == '.') {
-        printf("%c", tape[pointer]);
-        fflush(stdout);
-    }
-
-    // handle input (,)
-    else if (ch == ',') {
-        tape[pointer] = getchar();
-    }
-
-    // handle loop opening ([)
-    else if (ch == '[') {
-        int flag = jumps[filePointer - 1];
-        // optimize [-]
-        if (flag == SET_ZERO) {
-            tape[pointer] = 0;
-            filePointer += 2;
-        }
-        // optimize [<]
-        else if (flag == SCAN_ZERO_LEFT) {
-            pointer = findZeroLeft(pointer);
-            filePointer += 2;
-        }
-        // optimize [>]
-        else if (flag == SCAN_ZERO_RIGHT) {
-            pointer = findZeroRight(pointer);
-            filePointer += 2;
-        }
-        // optimize jump
-        else if (tape[pointer] == 0) {
-            filePointer = jumps[filePointer - 1] + 1;
-        }
-    }
-
-    // handle loop closing (])
-    else if (ch == ']') {
-        if (tape[pointer] != 0) {
-            filePointer = jumps[filePointer - 1] + 1;
-        }
-    }
-}
-
-/**
  * Free all resources to prevent memory leaks.
  */
 void clean() {
     free(source);
     free(jumps);
     free(tape);
+    cleanupTranslator();
+}
+
+/**
+ * Generate the C file path.
+ */
+char* generateCFilePath(char* filePath) {
+    int length = strlen(filePath);
+
+    char* cFilePath = (char*) malloc(sizeof(char) * (length));
+
+    strcpy(cFilePath, filePath);
+
+    cFilePath[length - 2] = 'c';
+    cFilePath[length - 1] = '\0';
+
+    return cFilePath;
+}
+
+/**
+ * Generate the executable file path.
+ */
+char* generateExecutableFilePath(char* filePath) {
+    int length = strlen(filePath);
+
+    char* exeFilePath = (char*) malloc(sizeof(char) * (length));
+
+    strcpy(exeFilePath, filePath);
+
+    exeFilePath[length - 3] = '\0';
+
+    return exeFilePath;
 }
 
 /**
  * Execute the brainfuck source code.
  */
 void execute(char* filePath) {
-    // clean before exit
-    atexit(clean);
-
     // initialize tape and fill with zeros
     tape = (unsigned char*) malloc(sizeof(unsigned char) * (TAPE_SIZE));
     memset(tape, 0, TAPE_SIZE);
@@ -384,38 +308,18 @@ void execute(char* filePath) {
 
     // initialize file jumps for optimization
     initJumps();
-
-    /*cFile = fopen("E:\\a.c", "w");
-
-    fprintf(cFile, "#include<stdio.h>\n");
-    fprintf(cFile, "#include<string.h>\n\n");
-    fprintf(cFile, "#define TAPE_SIZE %d\n\n", TAPE_SIZE);
-    fprintf(cFile, "unsigned char tape[TAPE_SIZE];\n");
-    fprintf(cFile, "int pointer = 0;\n\n");
-    fprintf(cFile, "int findZeroLeft(int position) { for (int i = position; i >= 0; i--) { if (tape[i] == 0) { return i; } } for (int i = TAPE_SIZE - 1; i > position; i--) { if (tape[i] == 0) { return i; } } return -1; }\n");
-    fprintf(cFile, "int findZeroRight(int position) { for (int i = position; i < TAPE_SIZE; i++) { if (tape[i] == 0) { return i; } } for (int i = 0; i < position; i++) { if (tape[i] == 0) { return i; } } return -1; }\n\n");
-    fprintf(cFile, "int main() {\n");
-    fprintf(cFile, "memset(tape, 0, TAPE_SIZE);\n");*/
 
     // for each character do operation
     char ch;
     while ((ch = readChar()) != -1) {
         doOperation(ch);
-        //doTranslate(ch);
     }
-
-    /*fprintf(cFile, "return 0;\n}\
-    n");
-
-    fclose(cFile);*/
 }
-/**
- * Compile the brainfuck source code.
- */
-void compile(char* filePath) {
-    // clean before exit
-    atexit(clean);
 
+/**
+ * Translate the brainfuck source code into C code.
+ */
+void translate(char* filePath) {
     // initialize tape and fill with zeros
     tape = (unsigned char*) malloc(sizeof(unsigned char) * (TAPE_SIZE));
     memset(tape, 0, TAPE_SIZE);
@@ -426,33 +330,59 @@ void compile(char* filePath) {
     // initialize file jumps for optimization
     initJumps();
 
-    cFile = fopen("E:\\a.c", "w");
+    // generate C file path
+    cFilePath = generateCFilePath(filePath);
 
-    fprintf(cFile, "#include<stdio.h>\n");
-    fprintf(cFile, "#include<string.h>\n\n");
-    fprintf(cFile, "#define TAPE_SIZE %d\n\n", TAPE_SIZE);
-    fprintf(cFile, "unsigned char tape[TAPE_SIZE];\n");
-    fprintf(cFile, "int pointer = 0;\n\n");
-    fprintf(cFile, "int findZeroLeft(int position) { for (int i = position; i >= 0; i--) { if (tape[i] == 0) { return i; } } for (int i = TAPE_SIZE - 1; i > position; i--) { if (tape[i] == 0) { return i; } } return -1; }\n");
-    fprintf(cFile, "int findZeroRight(int position) { for (int i = position; i < TAPE_SIZE; i++) { if (tape[i] == 0) { return i; } } for (int i = 0; i < position; i++) { if (tape[i] == 0) { return i; } } return -1; }\n\n");
-    fprintf(cFile, "int main() {\n");
-    fprintf(cFile, "memset(tape, 0, TAPE_SIZE);\n");
+    // initialize the Brainfuck to C translator
+    initTranslator(cFilePath);
 
-    // for each character do operation
+    // write the common header for C file
+    writeCHeader();
+
+    // for each character do translation
     char ch;
     while ((ch = readChar()) != -1) {
         doTranslate(ch);
     }
 
-    fprintf(cFile, "return 0;\n}\n");
+    // write the common footer for C file
+    writeCFooter();
 
-    fclose(cFile);
+    // clean up the Brainfuck to C translator
+    cleanupTranslator();
+}
+
+/**
+ * Compile the generated C code.
+ */
+void compile(char* filePath) {
+    // generate C file path
+    cFilePath = generateCFilePath(filePath);
+
+    // generate executable file path
+    exeFilePath = generateExecutableFilePath(filePath);
+
+    // build command string
+    char command[strlen("gcc \"%s\" -o \"%s\"") + strlen(cFilePath) + strlen(exeFilePath)];
+    sprintf(command, "gcc \"%s\" -o \"%s\"", cFilePath, exeFilePath);
+
+    // compile the program
+    int out = system(command);
+
+    // free file paths
+    free(cFilePath);
+    free(exeFilePath);
+
+    // build failed
+    if (out != 0) {
+        fprintf(stderr, "Failed to compile program.");
+    }
 }
 
 /**
  * Compare two strings for equality, ignoring their cases.
  */
-int equalsIgnoreCase(char* str1, char* str2) {
+int equalsIgnoreCase(const char* str1, const char* str2) {
     for (int i = 0; ; i++) {
         if (str1[i] == '\0' && str2[i] == '\0') {
             break;
@@ -462,6 +392,21 @@ int equalsIgnoreCase(char* str1, char* str2) {
         }
     }
     return 1;
+}
+
+/**
+ * Check if first string ends with the second string.
+ */
+int endsWithIgnoreCase(const char *str, const char *suffix) {
+    if (!str || !suffix) {
+        return 0;
+    }
+    size_t lenstr = strlen(str);
+    size_t lensuffix = strlen(suffix);
+    if (lensuffix >  lenstr) {
+        return 0;
+    }
+    return equalsIgnoreCase(str + lenstr - lensuffix, suffix);
 }
 
 /**
@@ -479,6 +424,10 @@ void printHelp() {
     printf("    brainfuck [options] <source file path>\n\n");
 
     printf("Options:\n");
+    printf("    -c\n");
+    printf("    -compile    Translate to C and compile to machine code [requires gcc]\n\n");
+    printf("    -x\n");
+    printf("    -translate  Translate to C but do not compile\n\n");
     printf("    -t\n");
     printf("    -tape       Size of interpreter tape [must be equal to or above 10000]\n\n");
     printf("    -s\n");
@@ -495,6 +444,9 @@ void printHelp() {
  * Main entry point to the interpreter.
  */
 int main(int argc, char** argv) {
+
+    // by default, execute
+    int compileFlag = 0, translateFlag = 0;
 
     // variable to extract and store source file path from command line arguments
     char* path = NULL;
@@ -520,6 +472,16 @@ int main(int argc, char** argv) {
             printf("A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
             printf("https://github.com/prat-man/Brainfuck\n");
             exit(0);
+        }
+
+        // check if it is to be translated to C and compiled to machine code
+        else if (equalsIgnoreCase(argv[i], "-c") || equalsIgnoreCase(argv[i], "-compile")) {
+            compileFlag = 1;
+        }
+
+        // check if it is to be translated to C
+        else if (equalsIgnoreCase(argv[i], "-x") || equalsIgnoreCase(argv[i], "-translate")) {
+            translateFlag = 1;
         }
 
         // check if tape size is to be customized
@@ -567,8 +529,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    path = "test/mandelbrot.bf";
-
     // check if path to source file is present
     if (path == NULL) {
         if (argc > 1) {
@@ -583,8 +543,30 @@ int main(int argc, char** argv) {
         }
     }
 
-    // execute the brainfuck code
-    compile(path);
+    // check if filename is standards compliant
+    if (!endsWithIgnoreCase(path, ".bf")) {
+        fprintf(stderr, "File format not recognized [must end with \".bf\"]\n\n");
+        exit(1);
+    }
+
+    // clean before exit
+    atexit(clean);
+
+    // compile, translate, or execute
+    if (compileFlag) {
+        // translate the brainfuck code to C
+        translate(path);
+        // compile the translated C code
+        compile(path);
+    }
+    else if (translateFlag) {
+        // translate the brainfuck code to C
+        translate(path);
+    }
+    else {
+        // execute the brainfuck code
+        execute(path);
+    }
 
     // execution is successful, return success code
     return 0;
