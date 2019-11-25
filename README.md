@@ -15,6 +15,8 @@ The language's name is a reference to the slang term brainfuck, which refers to 
 This project provides a fast Brainfuck interpreter written in C.
 
 It is implemented with multiple optimizations to increase execution speed.<br>
+Default behaviour is to interpret and execute immediately.
+
 It is cross-platform compatible, and has been tested on Windows, Linux, and macOS.
 
 <br>
@@ -58,6 +60,8 @@ The generated C code is cross-platform compatible, and has been tested on Window
 
     -h
     --help        Show this help message and exit
+
+__Note:__ Default behaviour is to interpret and execute immediately.
 
 <br>
 
