@@ -33,6 +33,9 @@ unsigned char* tape = NULL;
 // pointer to current location in tape
 int pointer = 0;
 
+// loop stack
+Stack* stack = NULL;
+
 /**
  * Load source file into memory.
  */
@@ -96,7 +99,7 @@ void initJumps() {
     jumps = (int*) malloc(sizeof(int) * (fileSize));
 
     // create a stack for [ operators
-    Stack* stack = stackCreate(STACK_SIZE);
+    stack = stackCreate(STACK_SIZE);
 
     // find jumps to optimize code
     for (int i = 0; i < fileSize; i++) {
@@ -200,6 +203,7 @@ void initJumps() {
     if (!stackEmpty(stack)) {
         // free stack
         stackFree(stack);
+        stack = NULL;
 
         // display error message and exit
         fprintf(stderr, "Unmatched loops!");
@@ -271,6 +275,12 @@ void clean() {
     // free tape
     if (tape != NULL) {
         free(tape);
+    }
+
+    // free stack
+    if (stack != NULL) {
+        stackFree(stack);
+        stack = NULL;
     }
 
     // clean translator
@@ -403,9 +413,13 @@ void compile(char* filePath) {
     // compile the program
     int commandOut = executeCommand(command);
 
-    // free file paths
+    // free cFilePath
     free(cFilePath);
+    cFilePath = NULL;
+
+    // free exeFilePath
     free(exeFilePath);
+    exeFilePath = NULL;
 
     // build failed
     if (!commandOut) {
