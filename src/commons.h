@@ -3,6 +3,9 @@
 
 #define VERSION "1.1"
 
+#define MIN_TAPE_SIZE 1000
+#define MIN_STACK_SIZE 100
+
 #define NO_JUMP         INT_MAX
 #define SET_ZERO        (INT_MAX - 1)
 #define SCAN_ZERO_LEFT  (INT_MAX - 2)
@@ -13,6 +16,8 @@
 static int TAPE_SIZE;
 
 static int STACK_SIZE;
+
+char* programExecutablePath;
 
 int* jumps;
 
