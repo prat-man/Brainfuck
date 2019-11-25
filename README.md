@@ -12,9 +12,23 @@ The language's name is a reference to the slang term brainfuck, which refers to 
 
 ## Brainfuck Interpreter
 
-This project presents a fast Brainfuck interpreter written in C.
+This project provides a fast Brainfuck interpreter written in C.
 
-It is implemented with multiple optimizations to increase execution speed. It is cross-platform compatible, and has been tested on Windows and Linux.
+It is implemented with multiple optimizations to increase execution speed.<br>
+It is cross-platform compatible, and has been tested on Windows and Linux.
+
+<br>
+
+## Brainfuck Compiler
+
+This project provides a fast Brainfuck compiler written in C.
+
+It converts brainfuck code to highly optimized C code and then compiles the C code into machine executable file using GCC.
+To compile brainfuck code, use the <code>-c</code> option.
+
+If desired, brainfuck code can be translated to C code without compiling to executable using the <code>-x</code> option.
+
+The generated C code is cross-platform compatible, and has been tested on Windows and Linux.
 
 <br>
 
@@ -24,20 +38,26 @@ It is implemented with multiple optimizations to increase execution speed. It is
     
 #### Options
 
+    -c
+    --compile     Translate to C and compile to machine code [requires GCC]
+
+    -x
+    --translate   Translate to C but do not compile
+
     -t
-    -tape       Size of interpreter tape [must be equal to or above 10000]
+    --tape        Size of interpreter tape [must be equal to or above 1000]
 
     -s
-    -stack      Size of interpreter stack [must be equal to or above 1000]
+    --stack       Size of interpreter stack [must be equal to or above 100]
 
     -v
-    -version    Show product version and exit
+    --version     Show product version and exit
 
     -i
-    -info       Show product information and exit
+    --info        Show product information and exit
 
     -h
-    -help       Show this help message and exit
+    --help        Show this help message and exit
 
 <br>
 
