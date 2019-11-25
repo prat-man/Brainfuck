@@ -3,6 +3,7 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>
+#include <stddef.h>
 
 #include "stack.h"
 #include "commons.h"
@@ -352,6 +353,60 @@ void translate(char* filePath) {
     cleanupTranslator();
 }
 
+int can_run_command(const char *command) {
+    const char *head;
+
+    int length = strlen(command);
+    // Get the PATH environment variable
+    head = getenv("PATH");
+    if (head == NULL) {
+        fprintf(stderr, "the PATH variable was not set, what?\n");
+        return -1;
+    }
+    // Find the first separator
+    while (*head != '\0') {
+        struct stat st;
+        ptrdiff_t dirlen;
+        const char *tail;
+        char *path;
+        // Check for the next ':' if it's not found
+        // then get a pointer to the null terminator
+        tail = strchr(head, ':');
+        if (tail == NULL)
+            tail = strchr(head, '\0');
+        // Get the length of the string between the head
+        // and the ':'
+        dirlen = tail - head;
+        // Allocate space for the new string
+        path = malloc(length + dirlen + 2);
+        if (path == NULL)
+            return -1;
+        // Copy the directory path into the newly
+        // allocated space
+        memcpy(path, head, dirlen);
+        // Append the directory separator
+        path[dirlen] = '/';
+        // Copy the name of the command
+        memcpy(path + dirlen + 1, command, length);
+        // `null' terminate please
+        path[dirlen + length + 1] = '\0';
+        // Check if the file exists and whether it's
+        // executable
+        if ((stat(path, &st) != -1) && (S_ISREG(st.st_mode) != 0)) {
+            if ((st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) == 0) {
+                fprintf(stdout, "found `%s' but it's not executable\n", path);
+            } else {
+                fprintf(stdout, "found at: %s\n", path);
+            }
+        }
+        // Don't forget to free!
+        free(path);
+        // Point to the next directory
+        head = tail + 1;
+    }
+    return 0;
+}
+
 /**
  * Compile the generated C code.
  */
@@ -362,21 +417,35 @@ void compile(char* filePath) {
     // generate executable file path
     exeFilePath = generateExecutableFilePath(filePath);
 
+    // test if gcc is installed
+    if (!can_run_command("gcc")) {
+        fprintf(stderr, "gcc not found. gcc is required.\n");
+        exit(1);
+    }
+
     // build command string
     char command[strlen("gcc \"%s\" -o \"%s\"") + strlen(cFilePath) + strlen(exeFilePath)];
     sprintf(command, "gcc \"%s\" -o \"%s\"", cFilePath, exeFilePath);
 
     // compile the program
-    int out = system(command);
+    int commandOut = system(command);
 
     // free file paths
     free(cFilePath);
     free(exeFilePath);
 
     // build failed
-    if (out != 0) {
+    if (commandOut != 0) {
         fprintf(stderr, "Failed to compile program.");
+        exit(1);
     }
+}
+
+/**
+ * Compare two strings for equality, case sensitive.
+ */
+int equals(const char* str1, const char* str2) {
+    return strcmp(str1, str2) == 0;
 }
 
 /**
@@ -425,19 +494,19 @@ void printHelp() {
 
     printf("Options:\n");
     printf("    -c\n");
-    printf("    -compile    Translate to C and compile to machine code [requires gcc]\n\n");
+    printf("    --compile     Translate to C and compile to machine code [requires gcc]\n\n");
     printf("    -x\n");
-    printf("    -translate  Translate to C but do not compile\n\n");
+    printf("    --translate   Translate to C but do not compile\n\n");
     printf("    -t\n");
-    printf("    -tape       Size of interpreter tape [must be equal to or above 10000]\n\n");
+    printf("    --tape        Size of interpreter tape [must be equal to or above 10000]\n\n");
     printf("    -s\n");
-    printf("    -stack      Size of interpreter stack [must be equal to or above 1000]\n\n");
+    printf("    --stack       Size of interpreter stack [must be equal to or above 1000]\n\n");
     printf("    -v\n");
-    printf("    -version    Show product version and exit\n\n");
+    printf("    --version     Show product version and exit\n\n");
     printf("    -i\n");
-    printf("    -info       Show product information and exit\n\n");
+    printf("    --info        Show product information and exit\n\n");
     printf("    -h\n");
-    printf("    -help       Show this help message and exit\n\n");
+    printf("    --help        Show this help message and exit\n\n");
 }
 
 /**
@@ -454,20 +523,20 @@ int main(int argc, char** argv) {
     // extract parameters and source file path from command line arguments
     for (int i = 1; i < argc; i++) {
         // check if help message is to be displayed
-        if (equalsIgnoreCase(argv[i], "-h") || equalsIgnoreCase(argv[i], "-help")) {
+        if (equals(argv[i], "-h") || equals(argv[i], "--help")) {
             printf("\n");
             printHelp();
             exit(0);
         }
 
         // check if version is to be displayed
-        else if (equalsIgnoreCase(argv[i], "-v") || equalsIgnoreCase(argv[i], "-version")) {
+        else if (equals(argv[i], "-v") || equals(argv[i], "--version")) {
             printf("%s\n", VERSION);
             exit(0);
         }
 
         // check if informtion is to be displayed
-        else if (equalsIgnoreCase(argv[i], "-i") || equalsIgnoreCase(argv[i], "-info")) {
+        else if (equals(argv[i], "-i") || equals(argv[i], "--info")) {
             printf("brainfuck %s\n", VERSION);
             printf("A fast Brainfuck interpreter written in C by Pratanu Mandal\n");
             printf("https://github.com/prat-man/Brainfuck\n");
@@ -475,17 +544,17 @@ int main(int argc, char** argv) {
         }
 
         // check if it is to be translated to C and compiled to machine code
-        else if (equalsIgnoreCase(argv[i], "-c") || equalsIgnoreCase(argv[i], "-compile")) {
+        else if (equals(argv[i], "-c") || equals(argv[i], "--compile")) {
             compileFlag = 1;
         }
 
         // check if it is to be translated to C
-        else if (equalsIgnoreCase(argv[i], "-x") || equalsIgnoreCase(argv[i], "-translate")) {
+        else if (equals(argv[i], "-x") || equals(argv[i], "--translate")) {
             translateFlag = 1;
         }
 
         // check if tape size is to be customized
-        else if (equalsIgnoreCase(argv[i], "-t") || equalsIgnoreCase(argv[i], "-tape")) {
+        else if (equals(argv[i], "-t") || equals(argv[i], "--tape")) {
             int tapeSz = 0;
             if (i + 1 < argc) {
                 tapeSz = atoi(argv[++i]);
@@ -501,7 +570,7 @@ int main(int argc, char** argv) {
         }
 
         // check if stack size is to be changed
-        else if (equalsIgnoreCase(argv[i], "-s") || equalsIgnoreCase(argv[i], "-stack")) {
+        else if (equals(argv[i], "-s") || equals(argv[i], "--stack")) {
             int stackSz = 0;
             if (i + 1 < argc) {
                 stackSz = atoi(argv[++i]);
@@ -518,12 +587,13 @@ int main(int argc, char** argv) {
 
         // get the path to source file (only once)
         else if (path == NULL) {
+
             path = argv[i];
         }
 
         // unknown parameter, display error
         else {
-            fprintf(stderr, "Invalid paramter: %s\n\n", argv[i]);
+            fprintf(stderr, "Unknown paramter: %s\n\n", argv[i]);
             printHelp();
             exit(1);
         }
@@ -545,7 +615,8 @@ int main(int argc, char** argv) {
 
     // check if filename is standards compliant
     if (!endsWithIgnoreCase(path, ".bf")) {
-        fprintf(stderr, "File format not recognized [must end with \".bf\"]\n\n");
+        fprintf(stderr, "Invalid file name: %s\n", path);
+        fprintf(stderr, "File format not recognized [must end with \".bf\"]\n");
         exit(1);
     }
 
