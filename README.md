@@ -84,4 +84,4 @@ Run the following commands inside <code>src</code> directory.
 
 ## Credits
 
-The brainfuck interpreter icon is made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
+The brainfuck interpreter/compiler icon is made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>.
