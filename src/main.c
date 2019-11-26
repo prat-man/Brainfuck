@@ -260,38 +260,6 @@ int findZeroRight(int position) {
 }
 
 /**
- * Free all resources to prevent memory leaks.
- */
-void clean() {
-    // free source
-    if (source != NULL) {
-        free(source);
-        source = NULL;
-    }
-
-    // free jumps
-    if (jumps != NULL) {
-        free(jumps);
-        jumps = NULL;
-    }
-
-    // free tape
-    if (tape != NULL) {
-        free(tape);
-        tape = NULL;
-    }
-
-    // free stack
-    if (stack != NULL) {
-        stackFree(stack);
-        stack = NULL;
-    }
-
-    // clean translator
-    cleanupTranslator();
-}
-
-/**
  * Generate the C file path.
  */
 char* generateCFilePath(char* filePath) {
@@ -467,6 +435,38 @@ int endsWithIgnoreCase(const char *str, const char *suffix) {
         return 0;
     }
     return equalsIgnoreCase(str + lenstr - lensuffix, suffix);
+}
+
+/**
+ * Free all resources to prevent memory leaks.
+ */
+void clean() {
+    // free source
+    if (source != NULL) {
+        free(source);
+        source = NULL;
+    }
+
+    // free jumps
+    if (jumps != NULL) {
+        free(jumps);
+        jumps = NULL;
+    }
+
+    // free tape
+    if (tape != NULL) {
+        free(tape);
+        tape = NULL;
+    }
+
+    // free stack
+    if (stack != NULL) {
+        stackFree(stack);
+        stack = NULL;
+    }
+
+    // clean translator
+    cleanupTranslator();
 }
 
 /**
