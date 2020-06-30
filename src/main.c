@@ -37,8 +37,14 @@ static int STACK_SIZE = 1000;
 // source file stored in memory for fast access
 char* source = NULL;
 
+// pre-processed source file stored in memory for fast access
+char* processed = NULL;
+
 // size of source file in chars
 int fileSize;
+
+// size of pre-processed source file in chars
+int processedFileSize;
 
 // pointer to next character to be read from file
 int filePointer = 0;
@@ -114,14 +120,16 @@ void loadFile(char* filePath) {
  * Optimizes [>] to scan_right(0).
  */
 void initJumps() {
-    // initialize jumps
+    // initialize pre-processed source and jumps
+    processed = (char*) malloc(sizeof(char) * (fileSize));
     jumps = (int*) malloc(sizeof(int) * (fileSize));
 
     // create a stack for [ operators
     stack = stackCreate(STACK_SIZE);
 
     // find jumps to optimize code
-    for (int i = 0; i < fileSize; i++) {
+    int i, index;
+    for (i = 0, index = 0; i < fileSize; i++, index++) {
         // get one character
         char ch = source[i];
 
@@ -131,27 +139,31 @@ void initJumps() {
             char ch3 = i + 2 < fileSize ? source[i + 2] : -1;
             if (ch2 == '-' && ch3 == ']') {
                 // optimize [-] to set(0)
-                jumps[i] = SET_ZERO;
+                processed[index] = SET_ZERO;
                 i += 2;
             }
             else if (ch2 == '<' && ch3 == ']') {
                 // optimize [<] to scan_left(0)
-                jumps[i] = SCAN_ZERO_LEFT;
+                processed[index] = SCAN_ZERO_LEFT;
                 i += 2;
             }
             else if (ch2 == '>' && ch3 == ']') {
                 // optimize [>] to scan_right(0)
-                jumps[i] = SCAN_ZERO_RIGHT;
+                processed[index] = SCAN_ZERO_RIGHT;
                 i += 2;
             }
             else {
-                stackPush(stack, i);
+                // push opening bracket [ to stack
+                processed[index] = ch;
+                stackPush(stack, index);
             }
         }
         else if (ch == ']') {
+            // pop opening bracket and swap indexes in jump table
             int x = stackPop(stack);
-            jumps[x] = i;
-            jumps[i] = x;
+            jumps[x] = index;
+            jumps[index] = x;
+            processed[index] = ch;
         }
 
         // compact and jump for > and <
@@ -161,7 +173,6 @@ void initJumps() {
             if (ch == '>') sum++;
             else sum--;
 
-            int index = i;
             while (++i < fileSize) {
                 if (source[i] == '>') {
                     sum++;
@@ -174,13 +185,9 @@ void initJumps() {
                 }
             }
             i--;
-            if (index == i) {
-                jumps[index] = NO_JUMP;
-            }
-            else {
-                jumps[index] = i;
-                jumps[i] = sum;
-            }
+
+            processed[index] = ADDRESS;
+            jumps[index] = sum;
         }
 
         // compact and jump for + and -
@@ -190,7 +197,6 @@ void initJumps() {
             if (ch == '+') sum++;
             else sum--;
 
-            int index = i;
             while (++i < fileSize) {
                 if (source[i] == '+') {
                     sum++;
@@ -203,20 +209,25 @@ void initJumps() {
                 }
             }
             i--;
-            if (index == i) {
-                jumps[index] = NO_JUMP;
-            }
-            else {
-                jumps[index] = i;
-                jumps[i] = sum;
-            }
+
+            processed[index] = DATA;
+            jumps[index] = sum;
         }
 
-        // everything else, no jumps
+        // input/output no jump
+        else if (ch == ',' || ch == '.') {
+            processed[index] = ch;
+            jumps[index] = NO_JUMP;
+        }
+
+        // for everything else, do not include in pre-processed source
         else {
-            jumps[i] = 0;
+            index--;
         }
     }
+
+    // set size of pre-processed file
+    processedFileSize = index;
 
     // loops are unmatched
     if (!stackEmpty(stack)) {
@@ -237,11 +248,11 @@ void initJumps() {
 /**
  * Read a single character from the source file.
  */
-char readChar() {
-    if (filePointer == fileSize) {
+static inline char readChar() {
+    if (filePointer == processedFileSize) {
         return -1;
     }
-    return source[filePointer++];
+    return processed[filePointer++];
 }
 
 /**

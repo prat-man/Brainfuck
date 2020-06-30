@@ -105,50 +105,18 @@ static inline void writeCFooter() {
  */
 static inline void doTranslate(char ch) {
     // handle pointer movement (> and <)
-    if (ch == '>' || ch == '<') {
-        int index = jumps[filePointer - 1];
+    if (ch == ADDRESS) {
+        int sum = jumps[filePointer - 1];
 
-        if (index == NO_JUMP) {
-            if (ch == '>') {
-                fprintf(cFile, "%spointer = (pointer + 1) %% TAPE_SIZE;\n", indent);
-            }
-            else {
-                fprintf(cFile, "%sif (pointer == 0) pointer = TAPE_SIZE - 1;\n", indent);
-                fprintf(cFile, "%selse pointer--;\n", indent);
-            }
-        }
-        else {
-            int sum = jumps[index];
-
-            if (sum > 0) {
-                fprintf(cFile, "%spointer = (pointer + %d) %% TAPE_SIZE;\n", indent, sum);
-            }
-            else if (sum < 0) {
-                fprintf(cFile, "%spointer = (pointer + %d);\n", indent, sum);
-                fprintf(cFile, "%sif (pointer < 0) pointer += TAPE_SIZE;\n", indent);
-            }
-
-            filePointer = index + 1;
-        }
+        fprintf(cFile, "%spointer += %d;\n", indent, sum);
+        fprintf(cFile, "%sif (pointer >= TAPE_SIZE) pointer -= TAPE_SIZE;\n", indent);
+        fprintf(cFile, "%selse if (pointer < 0) pointer += TAPE_SIZE;\n", indent);
     }
 
     // handle value update (+ and -)
-    else if (ch == '+' || ch == '-') {
-        int index = jumps[filePointer - 1];
-
-        if (index == NO_JUMP) {
-            if (ch == '+') {
-                fprintf(cFile, "%stape[pointer]++;\n", indent);
-            }
-            else {
-                fprintf(cFile, "%stape[pointer]--;\n", indent);
-            }
-        }
-        else {
-            int sum = jumps[index];
-            filePointer = index + 1;
-            fprintf(cFile, "%stape[pointer] += %d;\n", indent, sum);
-        }
+    else if (ch == DATA) {
+        int sum = jumps[filePointer - 1];
+        fprintf(cFile, "%stape[pointer] += %d;\n", indent, sum);
     }
 
     // handle output (.)
@@ -162,30 +130,27 @@ static inline void doTranslate(char ch) {
         fprintf(cFile, "%stape[pointer] = getchar();\n", indent);
     }
 
+    // handle [-]
+    else if (ch == SET_ZERO) {
+        tape[pointer] = 0;
+        fprintf(cFile, "%stape[pointer] = 0;\n", indent);
+    }
+
+    // handle [<]
+    else if (ch == SCAN_ZERO_LEFT) {
+        fprintf(cFile, "%spointer = findZeroLeft(pointer);\n", indent);
+    }
+
+    // handle [>]
+    else if (ch == SCAN_ZERO_RIGHT) {
+        fprintf(cFile, "%spointer = findZeroRight(pointer);\n", indent);
+    }
+
     // handle loop opening ([)
     else if (ch == '[') {
-        int flag = jumps[filePointer - 1];
-        // optimize [-]
-        if (flag == SET_ZERO) {
-            filePointer += 2;
-            fprintf(cFile, "%stape[pointer] = 0;\n", indent);
-        }
-        // optimize [<]
-        else if (flag == SCAN_ZERO_LEFT) {
-            filePointer += 2;
-            fprintf(cFile, "%spointer = findZeroLeft(pointer);\n", indent);
-        }
-        // optimize [>]
-        else if (flag == SCAN_ZERO_RIGHT) {
-            filePointer += 2;
-            fprintf(cFile, "%spointer = findZeroRight(pointer);\n", indent);
-        }
-        // start loop
-        else {
-            fprintf(cFile, "%swhile (tape[pointer] != 0) {\n", indent);
-            indent[indentPointer++] = '\t';
-            indent[indentPointer] = '\0';
-        }
+        fprintf(cFile, "%swhile (tape[pointer] != 0) {\n", indent);
+        indent[indentPointer++] = '\t';
+        indent[indentPointer] = '\0';
     }
 
     // handle loop closing (])

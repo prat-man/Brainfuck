@@ -28,56 +28,17 @@
  */
 static inline void doOperation(char ch) {
     // handle pointer movement (> and <)
-    if (ch == '>' || ch == '<') {
-        int index = jumps[filePointer - 1];
-
-        if (index == NO_JUMP) {
-            if (ch == '>') {
-                pointer = (pointer + 1) % TAPE_SIZE;
-            }
-            else {
-                if (pointer == 0) {
-                    pointer = TAPE_SIZE - 1;
-                }
-                else {
-                    pointer--;
-                }
-            }
-        }
-        else {
-            int sum = jumps[index];
-
-            if (sum > 0) {
-                pointer = (pointer + sum) % TAPE_SIZE;
-            }
-            else if (sum < 0) {
-                pointer = (pointer + sum);
-                if (pointer < 0) {
-                    pointer = TAPE_SIZE + pointer;
-                }
-            }
-
-            filePointer = index + 1;
-        }
+    if (ch == ADDRESS) {
+        int sum = jumps[filePointer - 1];
+        pointer += sum;
+        if (pointer >= TAPE_SIZE) pointer -= TAPE_SIZE;
+        else if (pointer < 0) pointer += TAPE_SIZE;
     }
 
     // handle value update (+ and -)
-    else if (ch == '+' || ch == '-') {
-        int index = jumps[filePointer - 1];
-
-        if (index == NO_JUMP) {
-            if (ch == '+') {
-                tape[pointer]++;
-            }
-            else {
-                tape[pointer]--;
-            }
-        }
-        else {
-            int sum = jumps[index];
-            tape[pointer] += sum;
-            filePointer = index + 1;
-        }
+    else if (ch == DATA) {
+        int sum = jumps[filePointer - 1];
+        tape[pointer] += sum;
     }
 
     // handle output (.)
@@ -91,26 +52,24 @@ static inline void doOperation(char ch) {
         tape[pointer] = getchar();
     }
 
+    // handle [-]
+    else if (ch == SET_ZERO) {
+        tape[pointer] = 0;
+    }
+
+    // handle [<]
+    else if (ch == SCAN_ZERO_LEFT) {
+        pointer = findZeroLeft(pointer);
+    }
+
+    // handle [>]
+    else if (ch == SCAN_ZERO_RIGHT) {
+        pointer = findZeroRight(pointer);
+    }
+
     // handle loop opening ([)
     else if (ch == '[') {
-        int flag = jumps[filePointer - 1];
-        // optimize [-]
-        if (flag == SET_ZERO) {
-            tape[pointer] = 0;
-            filePointer += 2;
-        }
-        // optimize [<]
-        else if (flag == SCAN_ZERO_LEFT) {
-            pointer = findZeroLeft(pointer);
-            filePointer += 2;
-        }
-        // optimize [>]
-        else if (flag == SCAN_ZERO_RIGHT) {
-            pointer = findZeroRight(pointer);
-            filePointer += 2;
-        }
-        // optimize jump
-        else if (tape[pointer] == 0) {
+        if (tape[pointer] == 0) {
             filePointer = jumps[filePointer - 1] + 1;
         }
     }
