@@ -48,8 +48,8 @@ unsigned char* tape;
 
 int pointer;
 
-static inline int findZeroLeft(int position);
+int findZeroLeft(int position);
 
-static inline int findZeroRight(int position);
+int findZeroRight(int position);
 
 #endif // COMMONS_H
