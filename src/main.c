@@ -230,7 +230,6 @@ void initJumps() {
         // input or output no jump
         else if (ch == ',' || ch == '.') {
             processed[index] = ch;
-            jumps[index] = NO_JUMP;
         }
 
         // for everything else, do not include in pre-processed source
