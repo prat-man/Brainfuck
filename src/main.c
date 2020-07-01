@@ -186,6 +186,12 @@ void initJumps() {
             }
             i--;
 
+            // optimize out address operations if sum is zero
+            if (sum == 0) {
+                index--;
+                continue;
+            }
+
             processed[index] = ADDRESS;
             jumps[index] = sum;
         }
@@ -210,8 +216,12 @@ void initJumps() {
             }
             i--;
 
-            // optimize out data operations if next operator is an input operation
-            if (source[i + 1] == ',') continue;
+            // optimize out data operations if sum is zero
+            // or next operator is an input operation
+            if (sum == 0 || source[i + 1] == ',') {
+                index--;
+                continue;
+            }
 
             processed[index] = DATA;
             jumps[index] = sum;
