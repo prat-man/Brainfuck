@@ -73,7 +73,7 @@ void loadFile(char* filePath) {
             // get the size of the file
             long bufsize = ftell(fp);
             if (bufsize == -1) {
-                // display error message and exir
+                // display error message and exit
                 fprintf(stderr, "Error reading source file: %s\n", filePath);
                 exit(1);
             }
@@ -210,11 +210,14 @@ void initJumps() {
             }
             i--;
 
+            // optimize out data operations if next operator is an input operation
+            if (source[i + 1] == ',') continue;
+
             processed[index] = DATA;
             jumps[index] = sum;
         }
 
-        // input/output no jump
+        // input or output no jump
         else if (ch == ',' || ch == '.') {
             processed[index] = ch;
             jumps[index] = NO_JUMP;
