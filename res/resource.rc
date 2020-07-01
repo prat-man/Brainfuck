@@ -24,8 +24,8 @@ A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "icon.ico"
 
 // VERSIONINFO
 1 VERSIONINFO
-FILEVERSION 1,1,0,0
-PRODUCTVERSION 1,1,0,0
+FILEVERSION 1,2,0,0
+PRODUCTVERSION 1,2,0,0
 FILETYPE VFT_APP
 {
   BLOCK "StringFileInfo"
@@ -40,7 +40,7 @@ FILETYPE VFT_APP
 			 VALUE "LegalTrademarks", ""
 			 VALUE "OriginalFilename", "brainfuck.exe"
 			 VALUE "ProductName", "Brainfuck Interpreter"
-			 VALUE "ProductVersion", "1.1"
+			 VALUE "ProductVersion", "1.2"
 		 }
 	 }
   BLOCK "VarFileInfo"
