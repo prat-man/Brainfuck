@@ -78,8 +78,8 @@ Run the following commands inside <code>src</code> directory.
 ## Optimizations
 
  * Jumps between [ and ]
- * Compacts and jumps consecutive > and <
- * Compacts and jumps consecutive + and -
+ * Compacts consecutive > and <
+ * Compacts consecutive + and -
  * Optimizes [-] to set(0)
  * Optimizes [<] to scan_left(0)
  * Optimizes [>] to scan_right(0)
