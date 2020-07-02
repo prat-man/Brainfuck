@@ -489,6 +489,12 @@ void clean() {
         source = NULL;
     }
 
+    // free processed
+    if (processed != NULL) {
+        free(processed);
+        processed = NULL;
+    }
+
     // free jumps
     if (jumps != NULL) {
         free(jumps);
