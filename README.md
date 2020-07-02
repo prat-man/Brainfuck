@@ -83,8 +83,8 @@ Run the following commands inside <code>src</code> directory.
  * Optimizes [-] to set(0)
  * Optimizes [<] to scan_left(0)
  * Optimizes [>] to scan_right(0)
- * Removes consecutive > and < if the end movement is zero
- * Removes consecutive + and - if the end change is zero
+ * Removes consecutive > and < if the net movement is zero
+ * Removes consecutive + and - if the net change is zero
  * Removes consecutive + and - if it is immediately followed by an input operation ( , )
 
 <br>
