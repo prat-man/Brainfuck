@@ -51,6 +51,9 @@ The generated C code is cross-platform compatible, and has been tested on Window
 
     -s
     --stack       Size of interpreter stack [must be equal to or above 100]
+    
+    -b
+    --buffered    Enable line buffer for faster output (experimental)
 
     -v
     --version     Show product version and exit
