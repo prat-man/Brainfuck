@@ -346,10 +346,23 @@ void execute(char* filePath) {
     // initialize file jumps for optimization
     initJumps();
 
-    // for each character do operation
-    char ch;
-    while ((ch = readChar()) != -1) {
-        doOperation(ch);
+    if (lineBuffered) {
+        initInterpreter();
+
+        // for each character do operation
+        char ch;
+        while ((ch = readChar()) != -1) {
+            doOperationBuffered(ch);
+        }
+
+        cleanupInterpreter();
+    }
+    else {
+        // for each character do operation
+        char ch;
+        while ((ch = readChar()) != -1) {
+            doOperationUnbuffered(ch);
+        }
     }
 }
 
@@ -540,6 +553,8 @@ void printHelp() {
     printf("    --tape        Size of interpreter tape [must be equal to or above %d]\n\n", MIN_TAPE_SIZE);
     printf("    -s\n");
     printf("    --stack       Size of interpreter stack [must be equal to or above %d]\n\n", MIN_STACK_SIZE);
+    printf("    -b\n");
+    printf("    --buffered    Enable line buffer for faster output (experimental)\n\n");
     printf("    -v\n");
     printf("    --version     Show product version and exit\n\n");
     printf("    -i\n");
@@ -575,6 +590,11 @@ int main(int argc, char** argv) {
             printf("\n");
             printHelp();
             exit(0);
+        }
+
+        // check if line buffered
+        else if (equals(argv[i], "-b") || equals(argv[i], "--buffered")) {
+            lineBuffered = TRUE;
         }
 
         // check if version is to be displayed

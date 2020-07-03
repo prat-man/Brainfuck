@@ -22,8 +22,13 @@
 
 #define VERSION "1.2"
 
+#define TRUE  1
+#define FALSE 0
+
 #define MIN_TAPE_SIZE   1000
 #define MIN_STACK_SIZE  100
+
+#define LINE_SIZE       1000
 
 #define NO_JUMP          0
 #define SET_ZERO        '!'
@@ -47,6 +52,8 @@ int filePointer;
 unsigned char* tape;
 
 int pointer;
+
+int lineBuffered = FALSE;
 
 int findZeroLeft(int position);
 
