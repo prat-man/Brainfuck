@@ -307,7 +307,7 @@ int findZeroRight(int position) {
 char* generateCFilePath(char* filePath) {
     int length = strlen(filePath);
 
-    char* cFilePath = (char*) malloc(sizeof(char) * (length));
+    char* cFilePath = (char*) malloc(sizeof(char) * (length + 1));
 
     strcpy(cFilePath, filePath);
 
@@ -323,7 +323,7 @@ char* generateCFilePath(char* filePath) {
 char* generateExecutableFilePath(char* filePath) {
     int length = strlen(filePath);
 
-    char* exeFilePath = (char*) malloc(sizeof(char) * (length));
+    char* exeFilePath = (char*) malloc(sizeof(char) * (length + 1));
 
     strcpy(exeFilePath, filePath);
 
