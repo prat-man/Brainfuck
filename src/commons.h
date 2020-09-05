@@ -22,7 +22,7 @@
 
 #define VERSION "1.2"
 
-#define MIN_TAPE_SIZE   1000
+#define MIN_MEMORY_SIZE   1000
 #define MIN_STACK_SIZE  100
 
 #define NO_JUMP          0
@@ -34,7 +34,7 @@
 
 #define isOperator(ch) (strchr("<>+-,.[]", ch) != NULL)
 
-static int TAPE_SIZE;
+static int MEMORY_SIZE;
 
 static int STACK_SIZE;
 
@@ -44,7 +44,7 @@ int* jumps;
 
 int filePointer;
 
-unsigned char* tape;
+unsigned char* memory;
 
 int pointer;
 

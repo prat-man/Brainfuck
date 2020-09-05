@@ -83,13 +83,13 @@ static inline void cleanupTranslator() {
 static inline void writeCHeader() {
     fprintf(cFile, "#include<stdio.h>\n");
     fprintf(cFile, "#include<string.h>\n\n");
-    fprintf(cFile, "#define TAPE_SIZE %d\n\n", TAPE_SIZE);
-    fprintf(cFile, "unsigned char tape[TAPE_SIZE];\n");
+    fprintf(cFile, "#define MEMORY_SIZE %d\n\n", MEMORY_SIZE);
+    fprintf(cFile, "unsigned char memory[MEMORY_SIZE];\n");
     fprintf(cFile, "int pointer = 0;\n\n");
-    fprintf(cFile, "int findZeroLeft(int position) {\n\tfor (int i = position; i >= 0; i--) {\n\t\tif (tape[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\tfor (int i = TAPE_SIZE - 1; i > position; i--) {\n\t\tif (tape[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\treturn -1;\n}\n\n");
-    fprintf(cFile, "int findZeroRight(int position) {\n\tfor (int i = position; i < TAPE_SIZE; i++) {\n\t\tif (tape[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\tfor (int i = 0; i < position; i++) {\n\t\tif (tape[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\treturn -1;\n}\n\n");
+    fprintf(cFile, "int findZeroLeft(int position) {\n\tfor (int i = position; i >= 0; i--) {\n\t\tif (memory[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\tfor (int i = MEMORY_SIZE - 1; i > position; i--) {\n\t\tif (memory[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\treturn -1;\n}\n\n");
+    fprintf(cFile, "int findZeroRight(int position) {\n\tfor (int i = position; i < MEMORY_SIZE; i++) {\n\t\tif (memory[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\tfor (int i = 0; i < position; i++) {\n\t\tif (memory[i] == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\treturn -1;\n}\n\n");
     fprintf(cFile, "int main() {\n");
-    fprintf(cFile, "\tmemset(tape, 0, TAPE_SIZE);\n\n");
+    fprintf(cFile, "\tmemset(memory, 0, MEMORY_SIZE);\n\n");
 }
 
 /**
@@ -109,31 +109,31 @@ static inline void doTranslate(char ch) {
         int sum = jumps[filePointer - 1];
 
         fprintf(cFile, "%spointer += %d;\n", indent, sum);
-        fprintf(cFile, "%sif (pointer >= TAPE_SIZE) pointer -= TAPE_SIZE;\n", indent);
-        fprintf(cFile, "%selse if (pointer < 0) pointer += TAPE_SIZE;\n", indent);
+        fprintf(cFile, "%sif (pointer >= MEMORY_SIZE) pointer -= MEMORY_SIZE;\n", indent);
+        fprintf(cFile, "%selse if (pointer < 0) pointer += MEMORY_SIZE;\n", indent);
     }
 
     // handle value update (+ and -)
     else if (ch == DATA) {
         int sum = jumps[filePointer - 1];
-        fprintf(cFile, "%stape[pointer] += %d;\n", indent, sum);
+        fprintf(cFile, "%smemory[pointer] += %d;\n", indent, sum);
     }
 
     // handle output (.)
     else if (ch == '.') {
-        fprintf(cFile, "%sprintf(\"%%c\", tape[pointer]);\n", indent);
+        fprintf(cFile, "%sprintf(\"%%c\", memory[pointer]);\n", indent);
         fprintf(cFile, "%sfflush(stdout);\n", indent);
     }
 
     // handle input (,)
     else if (ch == ',') {
-        fprintf(cFile, "%stape[pointer] = getchar();\n", indent);
+        fprintf(cFile, "%smemory[pointer] = getchar();\n", indent);
     }
 
     // handle [-]
     else if (ch == SET_ZERO) {
-        tape[pointer] = 0;
-        fprintf(cFile, "%stape[pointer] = 0;\n", indent);
+        memory[pointer] = 0;
+        fprintf(cFile, "%smemory[pointer] = 0;\n", indent);
     }
 
     // handle [<]
@@ -148,7 +148,7 @@ static inline void doTranslate(char ch) {
 
     // handle loop opening ([)
     else if (ch == '[') {
-        fprintf(cFile, "%swhile (tape[pointer] != 0) {\n", indent);
+        fprintf(cFile, "%swhile (memory[pointer] != 0) {\n", indent);
         indent[indentPointer++] = '\t';
         indent[indentPointer] = '\0';
     }

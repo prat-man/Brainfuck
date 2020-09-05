@@ -28,8 +28,8 @@
 #include "bfi.h"
 #include "bftoc.h"
 
-// size of tape to be used by the interpreter
-static int TAPE_SIZE = 30000;
+// size of memory to be used by the interpreter
+static int MEMORY_SIZE = 30000;
 
 // size of stack to be used by the interpreter
 static int STACK_SIZE = 1000;
@@ -52,10 +52,10 @@ int filePointer = 0;
 // jumps and flags are preinitialized for optimized execution
 int* jumps = NULL;
 
-// the brainfuck tape - 0-255 - circular
-unsigned char* tape = NULL;
+// the brainfuck memory - 0-255 - circular
+unsigned char* memory = NULL;
 
-// pointer to current location in tape
+// pointer to current location in memory
 int pointer = 0;
 
 // loop stack
@@ -268,16 +268,16 @@ static inline char readChar() {
 }
 
 /**
- * Find first zero in tape at or to the left of position.
+ * Find first zero in memory at or to the left of position.
  */
 int findZeroLeft(int position) {
     for (int i = position; i >= 0; i--) {
-        if (tape[i] == 0) {
+        if (memory[i] == 0) {
             return i;
         }
     }
-    for (int i = TAPE_SIZE - 1; i > position; i--) {
-        if (tape[i] == 0) {
+    for (int i = MEMORY_SIZE - 1; i > position; i--) {
+        if (memory[i] == 0) {
             return i;
         }
     }
@@ -285,16 +285,16 @@ int findZeroLeft(int position) {
 }
 
 /**
- * Find first zero in tape at or to the right of position.
+ * Find first zero in memory at or to the right of position.
  */
 int findZeroRight(int position) {
-    for (int i = position; i < TAPE_SIZE; i++) {
-        if (tape[i] == 0) {
+    for (int i = position; i < MEMORY_SIZE; i++) {
+        if (memory[i] == 0) {
             return i;
         }
     }
     for (int i = 0; i < position; i++) {
-        if (tape[i] == 0) {
+        if (memory[i] == 0) {
             return i;
         }
     }
@@ -336,9 +336,9 @@ char* generateExecutableFilePath(char* filePath) {
  * Execute the brainfuck source code.
  */
 void execute(char* filePath) {
-    // initialize tape and fill with zeros
-    tape = (unsigned char*) malloc(sizeof(unsigned char) * (TAPE_SIZE));
-    memset(tape, 0, TAPE_SIZE);
+    // initialize memory and fill with zeros
+    memory = (unsigned char*) malloc(sizeof(unsigned char) * (MEMORY_SIZE));
+    memset(memory, 0, MEMORY_SIZE);
 
     // load source file
     loadFile(filePath);
@@ -357,9 +357,9 @@ void execute(char* filePath) {
  * Translate the brainfuck source code into C code.
  */
 void translate(char* filePath) {
-    // initialize tape and fill with zeros
-    tape = (unsigned char*) malloc(sizeof(unsigned char) * (TAPE_SIZE));
-    memset(tape, 0, TAPE_SIZE);
+    // initialize memory and fill with zeros
+    memory = (unsigned char*) malloc(sizeof(unsigned char) * (MEMORY_SIZE));
+    memset(memory, 0, MEMORY_SIZE);
 
     // load source file
     loadFile(filePath);
@@ -501,10 +501,10 @@ void clean() {
         jumps = NULL;
     }
 
-    // free tape
-    if (tape != NULL) {
-        free(tape);
-        tape = NULL;
+    // free memory
+    if (memory != NULL) {
+        free(memory);
+        memory = NULL;
     }
 
     // free stack
@@ -537,7 +537,7 @@ void printHelp() {
     printf("    -x\n");
     printf("    --translate   Translate to C but do not compile\n\n");
     printf("    -t\n");
-    printf("    --tape        Size of interpreter tape [must be equal to or above %d]\n\n", MIN_TAPE_SIZE);
+    printf("    --memory      Size of interpreter memory [must be equal to or above %d]\n\n", MIN_MEMORY_SIZE);
     printf("    -s\n");
     printf("    --stack       Size of interpreter stack [must be equal to or above %d]\n\n", MIN_STACK_SIZE);
     printf("    -v\n");
@@ -601,17 +601,17 @@ int main(int argc, char** argv) {
             translateFlag = 1;
         }
 
-        // check if tape size is to be customized
-        else if (equals(argv[i], "-t") || equals(argv[i], "--tape")) {
-            int tapeSz = 0;
+        // check if memory size is to be customized
+        else if (equals(argv[i], "-t") || equals(argv[i], "--memory")) {
+            int memorySz = 0;
             if (i + 1 < argc) {
-                tapeSz = atoi(argv[++i]);
+                memorySz = atoi(argv[++i]);
             }
-            if (tapeSz >= MIN_TAPE_SIZE) {
-                TAPE_SIZE = tapeSz;
+            if (memorySz >= MIN_MEMORY_SIZE) {
+                MEMORY_SIZE = memorySz;
             }
             else {
-                fprintf(stderr, "Invalid tape size [must be at least %d]\n\n", MIN_TAPE_SIZE);
+                fprintf(stderr, "Invalid memory size [must be at least %d]\n\n", MIN_MEMORY_SIZE);
                 printHelp();
                 exit(1);
             }

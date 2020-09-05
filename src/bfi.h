@@ -31,30 +31,30 @@ static inline void doOperation(char ch) {
     if (ch == ADDRESS) {
         int sum = jumps[filePointer - 1];
         pointer += sum;
-        if (pointer >= TAPE_SIZE) pointer -= TAPE_SIZE;
-        else if (pointer < 0) pointer += TAPE_SIZE;
+        if (pointer >= MEMORY_SIZE) pointer -= MEMORY_SIZE;
+        else if (pointer < 0) pointer += MEMORY_SIZE;
     }
 
     // handle value update (+ and -)
     else if (ch == DATA) {
         int sum = jumps[filePointer - 1];
-        tape[pointer] += sum;
+        memory[pointer] += sum;
     }
 
     // handle output (.)
     else if (ch == '.') {
-        printf("%c", tape[pointer]);
+        printf("%c", memory[pointer]);
         fflush(stdout);
     }
 
     // handle input (,)
     else if (ch == ',') {
-        tape[pointer] = getchar();
+        memory[pointer] = getchar();
     }
 
     // handle [-]
     else if (ch == SET_ZERO) {
-        tape[pointer] = 0;
+        memory[pointer] = 0;
     }
 
     // handle [<]
@@ -69,14 +69,14 @@ static inline void doOperation(char ch) {
 
     // handle loop opening ([)
     else if (ch == '[') {
-        if (tape[pointer] == 0) {
+        if (memory[pointer] == 0) {
             filePointer = jumps[filePointer - 1] + 1;
         }
     }
 
     // handle loop closing (])
     else if (ch == ']') {
-        if (tape[pointer] != 0) {
+        if (memory[pointer] != 0) {
             filePointer = jumps[filePointer - 1] + 1;
         }
     }
