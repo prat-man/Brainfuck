@@ -536,7 +536,7 @@ void printHelp() {
     printf("    --compile     Translate to C and compile to machine code [requires GCC]\n\n");
     printf("    -x\n");
     printf("    --translate   Translate to C but do not compile\n\n");
-    printf("    -t\n");
+    printf("    -m\n");
     printf("    --memory      Size of interpreter memory [must be equal to or above %d]\n\n", MIN_MEMORY_SIZE);
     printf("    -s\n");
     printf("    --stack       Size of interpreter stack [must be equal to or above %d]\n\n", MIN_STACK_SIZE);
@@ -602,7 +602,7 @@ int main(int argc, char** argv) {
         }
 
         // check if memory size is to be customized
-        else if (equals(argv[i], "-t") || equals(argv[i], "--memory")) {
+        else if (equals(argv[i], "-m") || equals(argv[i], "--memory")) {
             int memorySz = 0;
             if (i + 1 < argc) {
                 memorySz = atoi(argv[++i]);
